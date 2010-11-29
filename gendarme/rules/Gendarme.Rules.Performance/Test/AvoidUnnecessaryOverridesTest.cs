@@ -35,6 +35,7 @@ using NUnit.Framework;
 
 using Test.Rules.Definitions;
 using Test.Rules.Fixtures;
+using Test.Rules.Helpers;
 
 namespace Tests.Rules.Performance {
 
@@ -42,67 +43,101 @@ namespace Tests.Rules.Performance {
 	public class AvoidUnnecessaryOverridesTest : TypeRuleTestFixture <AvoidUnnecessaryOverridesRule> {
 
 		private class TestBaseClass {
-			public virtual string DoSomething(string s)
+			public virtual string DoSomething (string s)
 			{
 				return s;
+			}
+			public virtual string DoSomething ()
+			{
+				return ":D";
 			}
 		}
 
 		private class TestClassGood : TestBaseClass {
 			[STAThread]
-			public override string DoSomething(string s)
+			public override string DoSomething (string s)
 			{
 				return base.DoSomething (s);
 			}
+			public override string DoSomething ()
+			{
+				return base.DoSomething (":P");
+			}
 			[FileIOPermission (SecurityAction.Demand)]
-			public override string ToString()
+			public override string ToString ()
 			{
 				return base.ToString ();
 			}
-			public override bool Equals(object obj)
+			public override bool Equals (object obj)
 			{
 				if (obj == null)
 					return false;
 				else
 					return base.Equals (obj);
+			}	
+		}
+
+		private class TestClassAlsoGood : ApplicationException {
+			public override bool Equals (object obj)
+			{
+				if (obj.GetType () != typeof (TestClassAlsoGood))
+					return false;
+
+				return base.Equals (obj);
 			}
 		}
 
 		private class TestClassBad : TestBaseClass {
-			public override string ToString()
+			public override string ToString ()
 			{
 				return base.ToString ();
 			}
-			public override string DoSomething(string s)
+			public override string DoSomething (string s)
 			{
 				return base.DoSomething (s);
 			}
+			public override string DoSomething ()
+			{
+				return base.DoSomething ();
+			}
+		}
+
+		private class TestClassAlsoBad : ApplicationException {
+			public override Exception GetBaseException ()
+			{
+				return base.GetBaseException ();
+			}
+		}
+
+		private class MySimpleClass {
 		}
 
 		private Mono.Cecil.TypeDefinition SimpleClassNoMethods;
 
 		[SetUp]
-		public void SetUp()
+		public void SetUp ()
 		{
 			// Classes always have a constuctor so we hack our own methodless class.
-			SimpleClassNoMethods = SimpleTypes.Class;
+			SimpleClassNoMethods = DefinitionLoader.GetTypeDefinition<MySimpleClass> ();
 			SimpleClassNoMethods.Methods.Clear ();
 		}
 
 		[Test]
-		public void Good()
+		public void Good ()
 		{
 			AssertRuleSuccess<TestClassGood> ();
+			AssertRuleSuccess<TestClassAlsoGood> ();
 		}
 
 		[Test]
-		public void Bad()
+		public void Bad ()
 		{
-			AssertRuleFailure<TestClassBad> (2);
+			AssertRuleFailure<TestClassBad> (3);
+			AssertRuleFailure<TestClassAlsoBad> (1);
 		}
 
 		[Test]
-		public void DoesNotApply()
+		public void DoesNotApply ()
 		{
 			AssertRuleDoesNotApply (SimpleClassNoMethods);
 		}
