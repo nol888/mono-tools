@@ -12,6 +12,7 @@ rules_sources =  \
 	AvoidTypeGetTypeForConstantStringsRule.cs \
 	AvoidUncalledPrivateCodeRule.cs \
 	AvoidUninstantiatedInternalClassesRule.cs \
+	AvoidUnnecessaryOverridesRule.cs \
 	AvoidUnneededCallsOnStringRule.cs \
 	AvoidUnneededFieldInitializationRule.cs \
 	AvoidUnneededUnboxingRule.cs \
@@ -72,4 +73,5 @@ tests_sources = \
 	AvoidUnusedPrivateFieldsTest.cs \
 	PreferCharOverloadTest.cs \
 	PreferLiteralOverInitOnlyFieldsTest.cs \
-	ReviewLinqMethodTest.cs
+	ReviewLinqMethodTest.cs \
+	AvoidUnnecessaryOverridesTest.cs
