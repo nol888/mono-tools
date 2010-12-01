@@ -98,7 +98,7 @@ namespace Gendarme.Rules.Performance {
 					i++;
 
 				// If the next instruction is not a call we are good.
-				if (!instrs[i].Is (Code.Call) && !instrs[i].Is(Code.Call))
+				if (!instrs[i].Is (Code.Call) && !instrs[i].Is (Code.Callvirt))
 					continue;
 				// Check to make sure the call is to the base class, and the same method name...
 				MethodReference mr = instrs[i].Operand as MethodReference;
@@ -114,22 +114,21 @@ namespace Gendarme.Rules.Performance {
 				if (mr.HasParameters != method.HasParameters)
 					continue;
 				// Check the parameter count and type.
-				if (mr.Parameters.Count != method.Parameters.Count)
+				if (mr.HasParameters && (mr.Parameters.Count != method.Parameters.Count))
 					continue;
-				// Shallow check for equality.
+				// Check for equality.
 				bool sameParam = true;
 				for (int o = 0; o < mr.Parameters.Count; o++) {
 					var p1 = mr.Parameters[o];
 					var p2 = method.Parameters[o];
 					sameParam = true;
-					sameParam &= p1.HasDefault == p2.HasDefault;
-					sameParam &= p1.HasFieldMarshal == p2.HasFieldMarshal;
-					sameParam &= p1.IsOptional == p2.IsOptional;
-					sameParam &= p1.IsOut == p2.IsOut;
+					sameParam &= p1.Attributes == p2.Attributes;
 					sameParam &= p1.ParameterType == p2.ParameterType;
-					if (!sameParam) break;
+					if (!sameParam)
+						break;
 				}
-				if (!sameParam) continue;
+				if (!sameParam)
+					continue;
 
 				i++;
 				// If the return type is void, all we should have is nop and return.
