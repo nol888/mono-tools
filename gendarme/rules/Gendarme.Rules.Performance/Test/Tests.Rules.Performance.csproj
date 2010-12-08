@@ -93,6 +93,7 @@
     <Compile Include="MathMinMaxCandidateTest.cs" />
     <Compile Include="OverrideValueTypeDefaultsTest.cs" />
     <Compile Include="PreferCharOverloadTest.cs" />
+    <Compile Include="PreferInterfaceConstraintOnGenericParameterForPrimitiveInterfaceTest.cs" />
     <Compile Include="PreferLiteralOverInitOnlyFieldsTest.cs" />
     <Compile Include="RemoveUnusedLocalVariablesTest.cs" />
     <Compile Include="ReviewLinqMethodTest.cs" />
